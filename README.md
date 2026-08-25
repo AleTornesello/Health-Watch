@@ -10,8 +10,8 @@ set of **settings** specific to that type (URL, host/port, credentials, ...).
 ## Features
 
 - One endpoint per service: `GET /service/<name>/health`
-- Pluggable checker types: `http`, `tcp`, `postgres`, `qdrant` out of the box,
-  more can be added with a single class
+- Pluggable checker types: `http`, `tcp`, `postgres`, `qdrant`, `docker` out
+  of the box, more can be added with a single class
 - Fails fast and loud: invalid or missing configuration exits the process at
   startup with a clear error, instead of failing silently at request time
 - Secrets kept out of the YAML file via `${VAR}` / `${VAR:-default}`
@@ -80,7 +80,20 @@ services:
       api_key: ${QDRANT_API_KEY}  # optional, omit if auth is disabled
       collection: documents      # optional; omit to just check the API is up
       timeout: 5                 # seconds, optional, default 5
+
+  - name: worker-container
+    type: docker
+    settings:
+      container: worker          # container name or ID
+      # base_url: unix://var/run/docker.sock  # optional, defaults to the local Docker environment
+      expect_running: true       # optional, default true
+      timeout: 5                 # seconds, optional, default 5
 ```
+
+The `docker` checker talks to the Docker Engine API (via the [`docker`](https://pypi.org/project/docker/)
+SDK, using the local Docker context unless `base_url` is set). A container
+is `unhealthy` if it isn't running, or - when it defines a `HEALTHCHECK` -
+if Docker reports it as anything other than `healthy`.
 
 Any string value in the file can reference an environment variable:
 
@@ -145,6 +158,7 @@ app/
     tcp_checker.py           type: tcp
     postgres_checker.py      type: postgres
     qdrant_checker.py        type: qdrant
+    docker_checker.py        type: docker
     __init__.py               Checker type registry / factory
 services.yaml                 Example / default configuration
 ```

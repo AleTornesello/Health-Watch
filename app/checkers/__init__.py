@@ -7,6 +7,7 @@ one entry to ``CHECKER_TYPES`` below - no changes needed anywhere else.
 from __future__ import annotations
 
 from app.checkers.base import BaseChecker
+from app.checkers.docker_checker import DockerChecker
 from app.checkers.http_checker import HttpChecker
 from app.checkers.postgres_checker import PostgresChecker
 from app.checkers.qdrant_checker import QdrantChecker
@@ -19,6 +20,7 @@ CHECKER_TYPES: dict[str, type[BaseChecker]] = {
     "tcp": TcpChecker,
     "postgres": PostgresChecker,
     "qdrant": QdrantChecker,
+    "docker": DockerChecker,
 }
 
 

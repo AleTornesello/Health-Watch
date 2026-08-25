@@ -41,3 +41,11 @@ services:
       # api_key: ${QDRANT_API_KEY}   # optional, omit if auth is disabled
       collection: documents   # optional; omit to just check the API is up
       timeout: 5
+
+  - name: worker-container
+    type: docker
+    settings:
+      container: worker             # container name or ID
+      # base_url: unix://var/run/docker.sock  # optional; defaults to the local Docker environment
+      expect_running: true            # optional, default true
+      timeout: 5
