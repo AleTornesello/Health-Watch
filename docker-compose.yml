@@ -1,0 +1,15 @@
+services:
+  health-watch:
+    build: .
+    ports:
+      - "8000:8000"
+    environment:
+      HEALTH_WATCH_SERVICES_FILE: /app/services.yaml
+      PRIMARY_DB_PASSWORD: ${PRIMARY_DB_PASSWORD:-postgres}
+      QDRANT_API_KEY: ${QDRANT_API_KEY:-}
+    volumes:
+      - ./services.yaml:/app/services.yaml:ro
+      # Uncomment to let the `docker` checker type talk to the host's Docker
+      # Engine (e.g. to monitor the "worker-container" example service).
+      # - /var/run/docker.sock:/var/run/docker.sock:ro
+    restart: unless-stopped
