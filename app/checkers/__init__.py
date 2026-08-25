@@ -9,6 +9,7 @@ from __future__ import annotations
 from app.checkers.base import BaseChecker
 from app.checkers.http_checker import HttpChecker
 from app.checkers.postgres_checker import PostgresChecker
+from app.checkers.qdrant_checker import QdrantChecker
 from app.checkers.tcp_checker import TcpChecker
 from app.exceptions import ConfigurationError
 from app.models import ServiceDefinition
@@ -17,6 +18,7 @@ CHECKER_TYPES: dict[str, type[BaseChecker]] = {
     "http": HttpChecker,
     "tcp": TcpChecker,
     "postgres": PostgresChecker,
+    "qdrant": QdrantChecker,
 }
 
 

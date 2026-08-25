@@ -31,3 +31,13 @@ services:
       password: ${PRIMARY_DB_PASSWORD:-postgres}
       database: app_db
       timeout: 5
+
+  - name: vector-store
+    type: qdrant
+    settings:
+      host: localhost
+      port: 6333             # optional, default 6333
+      https: false            # optional, default false
+      # api_key: ${QDRANT_API_KEY}   # optional, omit if auth is disabled
+      collection: documents   # optional; omit to just check the API is up
+      timeout: 5

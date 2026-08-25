@@ -10,8 +10,8 @@ set of **settings** specific to that type (URL, host/port, credentials, ...).
 ## Features
 
 - One endpoint per service: `GET /service/<name>/health`
-- Pluggable checker types: `http`, `tcp`, `postgres` out of the box, more can
-  be added with a single class
+- Pluggable checker types: `http`, `tcp`, `postgres`, `qdrant` out of the box,
+  more can be added with a single class
 - Fails fast and loud: invalid or missing configuration exits the process at
   startup with a clear error, instead of failing silently at request time
 - Secrets kept out of the YAML file via `${VAR}` / `${VAR:-default}`
@@ -70,6 +70,16 @@ services:
       password: ${PRIMARY_DB_PASSWORD:-postgres}
       database: app_db
       timeout: 5                # seconds, optional, default 5
+
+  - name: vector-store
+    type: qdrant
+    settings:
+      host: localhost
+      port: 6333                # optional, default 6333
+      https: false               # optional, default false
+      api_key: ${QDRANT_API_KEY}  # optional, omit if auth is disabled
+      collection: documents      # optional; omit to just check the API is up
+      timeout: 5                 # seconds, optional, default 5
 ```
 
 Any string value in the file can reference an environment variable:
@@ -134,6 +144,7 @@ app/
     http_checker.py          type: http
     tcp_checker.py           type: tcp
     postgres_checker.py      type: postgres
+    qdrant_checker.py        type: qdrant
     __init__.py               Checker type registry / factory
 services.yaml                 Example / default configuration
 ```
