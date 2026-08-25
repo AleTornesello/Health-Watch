@@ -3,11 +3,14 @@
 from __future__ import annotations
 
 import asyncio
+import logging
 
 import docker
 from pydantic import BaseModel
 
 from app.checkers.base import BaseChecker
+
+logger = logging.getLogger("health_watch.docker")
 
 
 class DockerSettings(BaseModel):
@@ -28,6 +31,10 @@ class DockerChecker(BaseChecker):
     def _check_container(self) -> str:
         # The Docker SDK's timeout is documented and typed as whole seconds.
         timeout_seconds = int(self.settings.timeout)
+        logger.info(
+            "[%s] requesting container '%s' (base_url=%s, timeout=%ss)",
+            self.name, self.settings.container, self.settings.base_url, timeout_seconds,
+        )
         client = (
             docker.DockerClient(base_url=self.settings.base_url, timeout=timeout_seconds)
             if self.settings.base_url
@@ -37,6 +44,11 @@ class DockerChecker(BaseChecker):
             container = client.containers.get(self.settings.container)
             status = container.status
             health = container.attrs.get("State", {}).get("Health", {}).get("Status")
+
+            logger.info(
+                "[%s] response status=%s health=%s attrs=%s",
+                self.name, status, health, container.attrs,
+            )
 
             # A container with a HEALTHCHECK is only truly up once Docker reports it healthy -
             # otherwise a running-but-broken process would still read as fine.
