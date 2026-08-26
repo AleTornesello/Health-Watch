@@ -35,13 +35,23 @@ class DockerChecker(BaseChecker):
             "[%s] requesting container '%s' (base_url=%s, timeout=%ss)",
             self.name, self.settings.container, self.settings.base_url, timeout_seconds,
         )
-        client = (
-            docker.DockerClient(base_url=self.settings.base_url, timeout=timeout_seconds)
-            if self.settings.base_url
-            else docker.from_env(timeout=timeout_seconds)
-        )
         try:
-            container = client.containers.get(self.settings.container)
+            client = (
+                docker.DockerClient(base_url=self.settings.base_url, timeout=timeout_seconds)
+                if self.settings.base_url
+                else docker.from_env(timeout=timeout_seconds)
+            )
+        except Exception as exc:
+            logger.error("[%s] failed to connect to Docker daemon (base_url=%s): %s", self.name, self.settings.base_url, exc)
+            raise
+
+        try:
+            try:
+                container = client.containers.get(self.settings.container)
+            except Exception as exc:
+                logger.error("[%s] failed to fetch container '%s': %s", self.name, self.settings.container, exc)
+                raise
+
             status = container.status
             health = container.attrs.get("State", {}).get("Health", {}).get("Status")
 
@@ -53,11 +63,13 @@ class DockerChecker(BaseChecker):
             # A container with a HEALTHCHECK is only truly up once Docker reports it healthy -
             # otherwise a running-but-broken process would still read as fine.
             if health is not None and health != "healthy":
-                raise RuntimeError(
-                    f"container '{self.settings.container}' health is '{health}' (status: {status})"
-                )
+                message = f"container '{self.settings.container}' health is '{health}' (status: {status})"
+                logger.warning("[%s] %s", self.name, message)
+                raise RuntimeError(message)
             if self.settings.expect_running and status != "running":
-                raise RuntimeError(f"container '{self.settings.container}' status is '{status}'")
+                message = f"container '{self.settings.container}' status is '{status}'"
+                logger.warning("[%s] %s", self.name, message)
+                raise RuntimeError(message)
 
             detail = f"container '{self.settings.container}' is {status}"
             return f"{detail}, health: {health}" if health else detail
