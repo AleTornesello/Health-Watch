@@ -10,8 +10,8 @@ set of **settings** specific to that type (URL, host/port, credentials, ...).
 ## Features
 
 - One endpoint per service: `GET /service/<name>/health`
-- Pluggable checker types: `http`, `tcp`, `postgres`, `qdrant`, `docker` out
-  of the box, more can be added with a single class
+- Pluggable checker types: `http`, `tcp`, `postgres`, `sqlserver`, `qdrant`, `docker`
+  out of the box, more can be added with a single class
 - Fails fast and loud: invalid or missing configuration exits the process at
   startup with a clear error, instead of failing silently at request time
 - Secrets kept out of the YAML file via `${VAR}` / `${VAR:-default}`
@@ -69,6 +69,16 @@ services:
       username: postgres
       password: ${PRIMARY_DB_PASSWORD:-postgres}
       database: app_db
+      timeout: 5                # seconds, optional, default 5
+
+  - name: reporting-db
+    type: sqlserver
+    settings:
+      host: localhost
+      port: 1433                # optional, default 1433
+      username: sa
+      password: ${SQLSERVER_PASSWORD}
+      database: master
       timeout: 5                # seconds, optional, default 5
 
   - name: vector-store
@@ -157,6 +167,7 @@ app/
     http_checker.py          type: http
     tcp_checker.py           type: tcp
     postgres_checker.py      type: postgres
+    sqlserver_checker.py     type: sqlserver
     qdrant_checker.py        type: qdrant
     docker_checker.py        type: docker
     __init__.py               Checker type registry / factory

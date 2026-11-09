@@ -9,6 +9,7 @@ dependencies = [
     "fastapi>=0.141.1",
     "httpx>=0.28.1",
     "pydantic>=2.13.4",
+    "pymssql>=2.4.6",
     "pyyaml>=6.0.3",
     "uvicorn[standard]>=0.52.4",
 ]

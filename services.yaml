@@ -49,3 +49,13 @@ services:
       # base_url: unix://var/run/docker.sock  # optional; defaults to the local Docker environment
       expect_running: true            # optional, default true
       timeout: 5
+
+  - name: reporting-db
+    type: sqlserver
+    settings:
+      host: localhost
+      port: 1433
+      username: sa
+      password: ${SQLSERVER_PASSWORD:-changeme}
+      database: master
+      timeout: 5
