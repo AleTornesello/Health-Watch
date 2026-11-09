@@ -1,0 +1,16 @@
+{
+  "name": "health-watch",
+  "version": "0.2.0",
+  "private": true,
+  "description": "Helper scripts for building and running Health Watch (a Python/FastAPI app).",
+  "scripts": {
+    "build": "node scripts/build.js",
+    "build:no-cache": "node scripts/build.js --no-cache",
+    "build:compose": "docker compose build",
+    "start": "docker compose up -d",
+    "stop": "docker compose down",
+    "logs": "docker compose logs -f health-watch",
+    "dev": "uv run uvicorn app.main:app --reload",
+    "sync": "uv sync"
+  }
+}
